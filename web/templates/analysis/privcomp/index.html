@@ -1,0 +1,29 @@
+{% load analysis_tags %}
+<div class="panel panel-default">
+    <table class="table table-striped">
+        <tr>
+            <th>PowerUp Report</th>
+            <td>Prior to Package Installation</td>
+            <td>Post Package Installation</td>
+        </tr>
+        <tr>
+            <th>Mongo ID</th>
+            <td>{{analysis|mongo_id}}</td>
+            <td>Prior to Package Installation</td>
+        </tr>
+        <tr>
+            <th>Cuckoo release</th>
+            <td>Prior to Package Installation</td>
+            <td>{{analysis.info.version}}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <td><a href="{% url "analysis.views.remove" analysis.info.id %}" class="btn btn-primary btn-small">Delete</a></td>
+            <td>Prior to Package Installation</td>
+        </tr>
+    </table>
+    Hello there, look at thissss!
+    {{analysis.preVulns}}
+    {{analysis.postVulns}}
+    {{analysis.powerup.test}}
+</div>

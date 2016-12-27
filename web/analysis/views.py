@@ -31,9 +31,11 @@ from lib.cuckoo.core.database import Database, TASK_PENDING, TASK_COMPLETED
 from lib.cuckoo.common.utils import store_temp_file, versiontuple
 from lib.cuckoo.common.constants import CUCKOO_ROOT, LATEST_HTTPREPLAY
 import modules.processing.network as network
+from bs4 import BeautifulSoup
 
 results_db = settings.MONGO
 fs = GridFS(results_db)
+filepath = '/Users/sam/Documents/Github/cuckoo/data/privesc/'
 
 @require_safe
 def index(request):
@@ -250,7 +252,7 @@ def search_behavior(request, task_id):
 @require_safe
 def report(request, task_id):
     report = results_db.analysis.find_one({"info.id": int(task_id)}, sort=[("_id", pymongo.DESCENDING)])
-
+   
     if not report:
         return render(request, "error.html", {
             "error": "The specified analysis does not exist",
@@ -281,7 +283,10 @@ def report(request, task_id):
     # Is this version of httpreplay deprecated?
     deprecated = httpreplay_version and \
         versiontuple(httpreplay_version) < versiontuple(LATEST_HTTPREPLAY)
-
+    
+    report["preVulns"] = pullPowerUpReportData('template')
+    report["postVulns"] = pullPowerUpReportData(task_id)
+    
     return render(request, "analysis/report.html", {
         "analysis": report,
         "domainlookups": domainlookups,
@@ -772,3 +777,20 @@ def reboot_analysis(request, task_id):
         "task_id": task_id,
         "baseurl": request.build_absolute_uri("/")[:-1],
     })
+
+def pullPowerUpReportData(task_id):
+ 
+    taskPrivEsc = filepath + 'task' + task_id + '.html'
+    vulns = {}
+
+    if os.path.isfile(taskPrivEsc):
+        #with open(taskPrivEsc, 'r') as f:
+        #    read_data = f.readlines()
+        
+        bs = BeautifulSoup(open(taskPrivEsc))
+
+        for header in bs.findAll('H2'):
+            data = row.findAll('td')
+            vulns[header.string] = data.string
+    
+    return vulns

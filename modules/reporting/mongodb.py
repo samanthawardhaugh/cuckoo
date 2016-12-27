@@ -248,6 +248,8 @@ class MongoDB(Report):
                 procmon.append(self.db.procmon.insert(chunk))
 
             report["procmon"] = procmon
+        
+        report["powerup"]["test"] = "hey this is a test object" 
 
         # Store the report and retrieve its object id.
         self.db.analysis.save(report)
